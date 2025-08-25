@@ -2,9 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../viewmodels/calculator_view_model.dart';
 import '../widgets/calc_button.dart';
+import '../viewmodels/sessions_view_model.dart';
 
 class CalculatorPage extends StatelessWidget {
-  const CalculatorPage({super.key});
+  const CalculatorPage({
+    super.key,
+    required this.sessionId,
+    required this.sessionTitle,
+  });
+
+  final String sessionId;
+  final String sessionTitle;
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +27,24 @@ class CalculatorPage extends StatelessWidget {
     ];
 
     return Scaffold(
-      appBar: AppBar(title: const Text('MVVM Calculator')),
+      appBar: AppBar(
+        title: Text(sessionTitle),
+        actions: [
+          IconButton(
+            tooltip: 'Rename',
+            onPressed: () => _renameDialog(context),
+            icon: const Icon(Icons.edit),
+          ),
+          IconButton(
+            tooltip: 'Close session',
+            onPressed: () {
+              context.read<SessionsViewModel>().removeSession(sessionId);
+              Navigator.pop(context);
+            },
+            icon: const Icon(Icons.close),
+          ),
+        ],
+      ),
       body: SafeArea(
         child: Column(
           children: [
@@ -73,6 +98,37 @@ class CalculatorPage extends StatelessWidget {
       ),
     );
   }
+
+  void _renameDialog(BuildContext context) {
+    final sessionsVm = context.read<SessionsViewModel>();
+    final current = sessionsVm.byId(sessionId)?.title ?? sessionTitle;
+    final controller = TextEditingController(text: current);
+    showDialog<void>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Rename calculation'),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          textInputAction: TextInputAction.done,
+          onSubmitted: (v) {
+            sessionsVm.renameSession(sessionId, v);
+            Navigator.pop(context);
+          },
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          FilledButton(
+            onPressed: () {
+              sessionsVm.renameSession(sessionId, controller.text);
+              Navigator.pop(context);
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _Keyboard extends StatelessWidget {
@@ -86,13 +142,12 @@ class _Keyboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 4 columns grid, with "0" spanning two columns
     return Padding(
       padding: const EdgeInsets.fromLTRB(12, 8, 12, 20),
       child: LayoutBuilder(
         builder: (context, constraints) {
           final width = constraints.maxWidth;
-          final height = 430.0;
+          const height = 430.0;
           return SizedBox(
             width: width,
             height: height,

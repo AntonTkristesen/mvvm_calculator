@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'viewmodels/calculator_view_model.dart';
 import 'services/calculator_service.dart';
-import 'views/calculator_page.dart';
+import 'viewmodels/sessions_view_model.dart';
+import 'views/main_menu_page.dart';
 
 void main() {
   runApp(const CalculatorApp());
@@ -16,8 +16,8 @@ class CalculatorApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         Provider<CalculatorService>(create: (_) => CalculatorService()),
-        ChangeNotifierProvider<CalculatorViewModel>(
-          create: (context) => CalculatorViewModel(context.read<CalculatorService>()),
+        ChangeNotifierProvider<SessionsViewModel>(
+          create: (context) => SessionsViewModel(context.read<CalculatorService>()),
         ),
       ],
       child: MaterialApp(
@@ -28,7 +28,7 @@ class CalculatorApp extends StatelessWidget {
           useMaterial3: true,
           fontFamily: 'Roboto',
         ),
-        home: const CalculatorPage(),
+        home: const MainMenuPage(), // Start at the Menu (View)
       ),
     );
   }
