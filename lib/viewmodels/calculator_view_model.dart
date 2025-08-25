@@ -16,6 +16,10 @@ class CalculatorViewModel extends ChangeNotifier {
 
   String get display => _error ?? _display;
 
+  // ----------------------
+  // Input handlers
+  // ----------------------
+
   void inputDigit(String digit) {
     if (_error != null) _clearError();
     if (_nextStartsFresh) {
@@ -104,7 +108,7 @@ class CalculatorViewModel extends ChangeNotifier {
       _display = _current;
       _nextStartsFresh = true;
 
-      _checkNice(result); 
+      _checkNice(result); // toast for 69 / 80085
 
       notifyListeners();
     } on FormatException catch (e) {
@@ -113,6 +117,31 @@ class CalculatorViewModel extends ChangeNotifier {
       _setError('Error');
     }
   }
+
+  // ----------------------
+  // Transfer hooks (UI-agnostic)
+  // ----------------------
+
+  /// What value should be transferred out of this calculator.
+  /// We use the *current entry/display* string so precision is preserved.
+  String exportValue() => _current;
+
+  /// Apply a value that came from another calculator session.
+  /// Treat it like the user just typed that number (operator/pending state preserved).
+  void applyExternalValue(String value) {
+    if (_error != null) _clearError();
+    // Validate & normalize
+    final parsed = double.tryParse(value);
+    if (parsed == null) return;
+    _current = _formatNumber(parsed);
+    _display = _current;
+    _nextStartsFresh = false; // continue typing or hit operator/equals
+    notifyListeners();
+  }
+
+  // ----------------------
+  // Helpers
+  // ----------------------
 
   String _formatNumber(double n) {
     final s = n.toStringAsPrecision(12);

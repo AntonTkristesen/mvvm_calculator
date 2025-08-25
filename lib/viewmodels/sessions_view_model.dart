@@ -55,4 +55,21 @@ class SessionsViewModel extends ChangeNotifier {
   }
 
   CalcSession? byId(String id) => _sessions[id];
+
+  // ----------------------
+  // Result transfer between sessions
+  // ----------------------
+
+  /// Transfers the *current value* from `fromId` to the target session `toId`.
+  /// Returns true if both sessions exist and the value was applied.
+  bool transferValue({required String fromId, required String toId}) {
+    final from = _sessions[fromId];
+    final to = _sessions[toId];
+    if (from == null || to == null) return false;
+
+    final value = from.vm.exportValue();
+    to.vm.applyExternalValue(value);
+    // No notifyListeners() needed—the target VM notifies its own listeners.
+    return true;
+  }
 }
