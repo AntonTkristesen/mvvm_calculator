@@ -142,69 +142,55 @@ class _Keyboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 8, 12, 20),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final width = constraints.maxWidth;
-          const height = 430.0;
-          return SizedBox(
-            width: width,
-            height: height,
-            child: GridView.count(
-              crossAxisCount: 4,
-              mainAxisSpacing: 12,
-              crossAxisSpacing: 12,
-              childAspectRatio: 1.2,
-              physics: const NeverScrollableScrollPhysics(),
-              children: buttons.map((label) {
-                final isPrimary = ['+', '−', '×', '÷', '='].contains(label);
-                final isWideZero = label == '0';
-                if (isWideZero) {
-                  return GridTile(
-                    child: GridTileBar(
-                      title: Row(
-                        children: [
-                          Expanded(
-                            flex: 2,
-                            child: CalcButton(
-                              label: '0',
-                              onPressed: () => onTap('0'),
-                              isPrimary: false,
-                              isLarge: true,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: CalcButton(
-                              label: '.',
-                              onPressed: () => onTap('.'),
-                              isPrimary: false,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: CalcButton(
-                              label: '=',
-                              onPressed: () => onTap('='),
-                              isPrimary: true,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }
+    return Expanded(  // <-- instead of SizedBox with fixed height
+      flex: 2,       // give keyboard 2/3 of the space
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(12, 8, 12, 20),
+        child: GridView.count(
+          crossAxisCount: 4,
+          mainAxisSpacing: 12,
+          crossAxisSpacing: 12,
+          childAspectRatio: 1.2,
+          children: buttons.map((label) {
+            final isPrimary = ['+', '−', '×', '÷', '='].contains(label);
+            final isWideZero = label == '0';
 
-                return CalcButton(
-                  label: label,
-                  onPressed: () => onTap(label),
-                  isPrimary: isPrimary,
-                );
-              }).toList(),
-            ),
-          );
-        },
+            if (isWideZero) {
+              return Row(
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: CalcButton(
+                      label: '0',
+                      onPressed: () => onTap('0'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: CalcButton(
+                      label: '.',
+                      onPressed: () => onTap('.'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: CalcButton(
+                      label: '=',
+                      onPressed: () => onTap('='),
+                      isPrimary: true,
+                    ),
+                  ),
+                ],
+              );
+            }
+
+            return CalcButton(
+              label: label,
+              onPressed: () => onTap(label),
+              isPrimary: isPrimary,
+            );
+          }).toList(),
+        ),
       ),
     );
   }

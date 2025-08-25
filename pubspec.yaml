@@ -9,6 +9,7 @@ dependencies:
   flutter:
     sdk: flutter
   provider: ^6.1.2
+  oktoast: ^3.4.0
 
 dev_dependencies:
   flutter_test:

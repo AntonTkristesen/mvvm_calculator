@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:oktoast/oktoast.dart'; // for toasts
 import '../services/calculator_service.dart';
 
 class CalculatorViewModel extends ChangeNotifier {
@@ -15,7 +16,6 @@ class CalculatorViewModel extends ChangeNotifier {
 
   String get display => _error ?? _display;
 
-  // Input handlers
   void inputDigit(String digit) {
     if (_error != null) _clearError();
     if (_nextStartsFresh) {
@@ -80,7 +80,6 @@ class CalculatorViewModel extends ChangeNotifier {
       if (_accumulator == null) {
         _accumulator = currentVal;
       } else if (_operator != null && !_nextStartsFresh) {
-        // Chain: perform pending operation first
         _accumulator = _service.evaluate(_accumulator!, _operator!, currentVal);
       }
       _operator = op;
@@ -104,6 +103,9 @@ class CalculatorViewModel extends ChangeNotifier {
       _current = _formatNumber(result);
       _display = _current;
       _nextStartsFresh = true;
+
+      _checkNice(result); 
+
       notifyListeners();
     } on FormatException catch (e) {
       _setError(e.message);
@@ -112,9 +114,7 @@ class CalculatorViewModel extends ChangeNotifier {
     }
   }
 
-  // Helpers
   String _formatNumber(double n) {
-    // Trim trailing .0 and keep up to 12 significant digits
     final s = n.toStringAsPrecision(12);
     final normalized = double.parse(s).toString();
     return normalized;
@@ -130,5 +130,15 @@ class CalculatorViewModel extends ChangeNotifier {
   void _clearError() {
     _error = null;
     _display = _current;
+  }
+
+  void _checkNice(double result) {
+    if (result == 69 || result == 80085) {
+      showToast(
+        "Nice!",
+        position: ToastPosition.bottom,
+        duration: const Duration(seconds: 3),
+      );
+    }
   }
 }
